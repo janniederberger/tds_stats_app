@@ -80,11 +80,10 @@ def player_stats(df):
 
         if not legacy_row.empty:
 
-            adv_games_old = int(legacy_row["adv_games"])
-            adv_wins_old = int(legacy_row["adv_wins"])
-
-            guard_games_old = int(legacy_row["guard_games"])
-            guard_wins_old = int(legacy_row["guard_wins"])
+            adv_games_old = int(legacy_row["adv_games"].iloc[0])
+            adv_wins_old = int(legacy_row["adv_wins"].iloc[0])
+            guard_games_old = int(legacy_row["guard_games"].iloc[0])
+            guard_wins_old = int(legacy_row["guard_wins"].iloc[0])
 
         else:
 

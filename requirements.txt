@@ -1,9 +1,6 @@
-numpy==1.26.4
-pandas==2.3.3
-plotly==5.16.0
-streamlit==1.27.0
-Pillow==9.5.0
-rich==14.3.3
-markdown-it-py==4.0.0
-mdurl==0.1.2
-pygments==2.19.2
+streamlit>=1.27
+numpy>=2.4
+pandas>=3.0
+pillow>=10
+plotly>=5.16
+rich>=14
