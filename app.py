@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -34,8 +33,6 @@ if menu == "Add Player":
 # -----------------------------
 elif menu == "Log Game":
     st.header("Log New Game")
-
-    # Spieler:innen laden
     players = get_players()
     if not players:
         st.warning("Add players first!")
@@ -43,7 +40,6 @@ elif menu == "Log Game":
 
     player_dict = {name: pid for pid, name in players}
 
-    # Spieler:innen für dieses Spiel auswählen
     selected_players = st.multiselect(
         "Players in this game:",
         list(player_dict.keys())
@@ -54,33 +50,21 @@ elif menu == "Log Game":
         st.stop()
 
     player_count = len(selected_players)
-
-    # Gewinnerteam auswählen
-    winning_team = st.selectbox(
-        "Winning Team",
-        ["Guardians", "Adventurers"]
-    )
+    winning_team = st.selectbox("Winning Team", ["Guardians", "Adventurers"])
 
     st.subheader("Player Roles")
     roles = {}
     for p in selected_players:
         roles[p] = st.selectbox(f"{p} Role", ["Guardian", "Adventurer"], key=f"role_{p}")
 
-    # Spiel speichern
     if st.button("Save Game"):
-        # Spiel in DB speichern
         game_id = add_game(player_count, winning_team)
-
         for player_name in selected_players:
             pid = player_dict[player_name]
             role = roles[player_name]
-
-            # Win korrekt berechnen
             won = (role == "Adventurer" and winning_team == "Adventurers") or \
                   (role == "Guardian" and winning_team == "Guardians")
-
             add_participation(game_id, pid, role, won)
-
         st.success(f"Game ({player_count} Player, Winning Team: {winning_team}) gespeichert!")
 
 # -----------------------------
@@ -89,9 +73,6 @@ elif menu == "Log Game":
 elif menu == "Dashboard":
     st.header("Dashboard")
     df = load_dataframe()
-    # if df.empty:
-    #     st.info("Keine Spiele eingetragen.")
-    #     st.stop()
 
     # --- Zeitfilter ---
     filter_type = st.selectbox("Zeitfilter", ["All time", "Seit Datum", "Letzte N Spiele"])
@@ -103,54 +84,40 @@ elif menu == "Dashboard":
         last_games = df.drop_duplicates("game_id").sort_values("date", ascending=False).head(n)["game_id"]
         df = df[df["game_id"].isin(last_games)]
         
-    # Spieler-Statistiken laden
     df_stats = player_stats(df)
     if df_stats.empty:
         st.info("No existing games.")
         st.stop()
         
-    st.markdown("<br><br>", unsafe_allow_html=True)  # mehrere Leerzeilen
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-        
     # --- Stars Section ---
-    # Top Spieler
     all_star = df_stats.sort_values("winrate", ascending=False).iloc[0]
     almighty_adv = df_stats.sort_values("adv_rate", ascending=False).iloc[0]
     groofy_guard = df_stats.sort_values("guardian_rate", ascending=False).iloc[0]
     
     cols = st.columns(3)
-    
     with cols[0]:
         st.markdown("***TDS All Star***")
         st.markdown(f"### {all_star['player']}")
         st.markdown(f"<h2 style='color:lightblue'>{all_star['winrate']*100:.1f}%</h2>", unsafe_allow_html=True)
-    
     with cols[1]:
         st.markdown("***Almighty Adventurer***")
         st.markdown(f"### {almighty_adv['player']}")
         st.markdown(f"<h2 style='color:olive'>{almighty_adv['adv_rate']*100:.1f}%</h2>", unsafe_allow_html=True)
-    
     with cols[2]:
         st.markdown("***Groofy Guardian***")
         st.markdown(f"### {groofy_guard['player']}")
         st.markdown(f"<h2 style='color:purple'>{groofy_guard['guardian_rate']*100:.1f}%</h2>", unsafe_allow_html=True)
             
-    
-    st.markdown("<br><br>", unsafe_allow_html=True)  # mehrere Leerzeilen
-    
-   
-    # Spieler-Statistiken laden
-    df_stats = player_stats(df)
-    if df_stats.empty:
-        st.info("No existing games.")
-        st.stop()
-    
-    # Sortierte Versionen für die Bar-Charts vorbereiten
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # --- Sorted Stats for Charts ---
     df_stats_sorted = df_stats.sort_values("winrate", ascending=True)
     df_adv_sorted = df_stats.sort_values("adv_rate", ascending=True)
     df_guard_sorted = df_stats.sort_values("guardian_rate", ascending=True)
     
-    # --- Total Winrate ---
+    # --- Total Winrate Chart ---
     st.subheader("Total Ranking")
     fig = go.Figure(go.Bar(
         y=df_stats_sorted["player"],
@@ -162,14 +129,14 @@ elif menu == "Dashboard":
     ))
     fig.update_layout(
         xaxis_title="Total Winrate (%)",
-        xaxis=dict(range=[0, 100]),  # Fixe Breite 0–100%
+        xaxis=dict(range=[0, 100]),
         yaxis_title="Spieler",
         margin=dict(l=100, r=50, t=20, b=50),
         height=50 + 30*len(df_stats_sorted)
     )
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # --- Adventurer Winrate ---
+    st.plotly_chart(fig, use_container_width=True, key="total_ranking_chart")
+
+    # --- Adventurer Winrate Chart ---
     st.subheader("Adventurer Ranking")
     fig_adv = go.Figure(go.Bar(
         y=df_adv_sorted["player"],
@@ -181,14 +148,14 @@ elif menu == "Dashboard":
     ))
     fig_adv.update_layout(
         xaxis_title="Adventurer Winrate (%)",
-        xaxis=dict(range=[0, 100]),  # Fixe Breite 0–100%
+        xaxis=dict(range=[0, 100]),
         yaxis_title="Spieler",
         margin=dict(l=100, r=50, t=20, b=50),
         height=50 + 30*len(df_adv_sorted)
     )
-    st.plotly_chart(fig_adv, use_container_width=True)
-    
-    # --- Guardian Winrate ---
+    st.plotly_chart(fig_adv, use_container_width=True, key="adv_ranking_chart")
+
+    # --- Guardian Winrate Chart ---
     st.subheader("Guardian Ranking")
     fig_guard = go.Figure(go.Bar(
         y=df_guard_sorted["player"],
@@ -200,21 +167,19 @@ elif menu == "Dashboard":
     ))
     fig_guard.update_layout(
         xaxis_title="Guardian Winrate (%)",
-        xaxis=dict(range=[0, 100]),  # Fixe Breite 0–100%
+        xaxis=dict(range=[0, 100]),
         yaxis_title="Spieler",
         margin=dict(l=100, r=50, t=20, b=50),
         height=50 + 30*len(df_guard_sorted)
     )
-    st.plotly_chart(fig_guard, use_container_width=True)
+    st.plotly_chart(fig_guard, use_container_width=True, key="guard_ranking_chart")
 
-    # --- Einzelspieler Analyse ---
+    # --- Single Player Analysis ---
     st.subheader("Single Player Analysis")
     player_sel = st.selectbox("Select Player", df_stats_sorted["player"].tolist())
     player_row = df_stats[df_stats["player"]==player_sel].iloc[0]
-    
-    # Anzahl Spiele anzeigen
-    st.write(f"**Games played:** {player_row['games']}") 
 
+    st.write(f"**Games played:** {player_row['games']}") 
     cols = st.columns([1,1,1])
     with cols[0]:
         st.markdown("**Total Winrate**")        
@@ -227,7 +192,7 @@ elif menu == "Dashboard":
             textinfo='percent+label'
         ))
         fig.update_layout(width=200,height=200,margin=dict(l=50,r=50,t=50,b=50), showlegend=False)
-        st.plotly_chart(fig,use_container_width=False)
+        st.plotly_chart(fig, use_container_width=False, key=f"single_total_{player_sel}")
     with cols[1]:
         st.markdown("**Adventurer Winrate**")        
         st.markdown(f"{int(player_row['adv_rate']*player_row['adv_games'])}/{player_row['adv_games']}")
@@ -239,7 +204,7 @@ elif menu == "Dashboard":
             textinfo='percent+label'
         ))
         fig.update_layout(width=200,height=200,margin=dict(l=50,r=50,t=50,b=50), showlegend=False)
-        st.plotly_chart(fig,use_container_width=False)
+        st.plotly_chart(fig, use_container_width=False, key=f"single_adv_{player_sel}")
     with cols[2]:
         st.markdown("**Guardian Winrate**")
         st.markdown(f"{int(player_row['guardian_rate']*player_row['guard_games'])}/{player_row['guard_games']}")
@@ -251,12 +216,11 @@ elif menu == "Dashboard":
             textinfo='percent+label'
         ))
         fig.update_layout(width=200,height=200,margin=dict(l=50,r=50,t=50,b=50), showlegend=False)
-        st.plotly_chart(fig,use_container_width=False)
+        st.plotly_chart(fig, use_container_width=False, key=f"single_guard_{player_sel}")
 
-    
-    st.markdown("<br><br>", unsafe_allow_html=True)  # mehrere Leerzeilen
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # --- Zwei-Spieler Analyse ---
+    # --- Two-Player Analysis ---
     st.subheader("Player Team Analysis")
     df = load_dataframe()
     if df.empty:
@@ -279,7 +243,7 @@ elif menu == "Dashboard":
                 textinfo='percent+label'
             ))
             fig.update_layout(width=200,height=200,margin=dict(l=50,r=50,t=50,b=50), showlegend=False)
-            st.plotly_chart(fig,use_container_width=False)
+            st.plotly_chart(fig, use_container_width=False, key=f"team_total_{player1}_{player2}")
         with cols[1]:
             st.markdown("**Team Adventurer Winrate**")
             fig = go.Figure(go.Pie(
@@ -290,7 +254,7 @@ elif menu == "Dashboard":
                 textinfo='percent+label'
             ))
             fig.update_layout(width=200,height=200,margin=dict(l=50,r=50,t=50,b=50), showlegend=False)
-            st.plotly_chart(fig,use_container_width=False)
+            st.plotly_chart(fig, use_container_width=False, key=f"team_adv_{player1}_{player2}")
         with cols[2]:
             st.markdown("**Team Guardian Winrate**")
             fig = go.Figure(go.Pie(
@@ -301,22 +265,18 @@ elif menu == "Dashboard":
                 textinfo='percent+label'
             ))
             fig.update_layout(width=200,height=200,margin=dict(l=50,r=50,t=50,b=50), showlegend=False)
-            st.plotly_chart(fig,use_container_width=False)
+            st.plotly_chart(fig, use_container_width=False, key=f"team_guard_{player1}_{player2}")
     else:
         st.info(f"No games with {player1} and {player2} found.")
         
-    st.markdown("<br><br>", unsafe_allow_html=True)  # mehrere Leerzeilen
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-    
     # --- Top N Spielerpaare ---
     st.subheader("Top Teams")
     st.markdown("Only Teams with at least 3 games together will appear in the statistic.")
-    
-    # Top-Paare laden, nur Paare mit min. 3 gemeinsamen Spielen
     df_pairs = top_player_synergies(df, top_n=20, min_games=3)
     
     if not df_pairs.empty:
-        # Spaltennamen für Anzeige anpassen
         df_pairs_display = df_pairs.rename(columns={
             "player1": "Player 1",
             "player2": "Player 2",
@@ -325,8 +285,6 @@ elif menu == "Dashboard":
             "adv_rate": "Team Adventurer Winrate",
             "guardian_rate": "Team Guardian Winrate"
         })
-        
-        # Index entfernen und Prozentwerte formatieren
         st.dataframe(
             df_pairs_display.reset_index(drop=True).style.format({
                 "Team Total Winrate": "{:.1%}",
@@ -337,8 +295,7 @@ elif menu == "Dashboard":
     else:
         st.info("No teams found with at least 3 games together.")
 
-    st.markdown("<br><br>", unsafe_allow_html=True)  # mehrere Leerzeilen
-
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     # --- Spielauswertung horizontal ---
     st.subheader("Wins by number of players (%)")
@@ -354,7 +311,6 @@ elif menu == "Dashboard":
         textposition="inside",
         marker_color=colors["Adventurers"]
     ))
-    
     fig.add_trace(go.Bar(
         y=pivot.index.astype(str),
         x=pivot["Guardians"],
@@ -364,7 +320,6 @@ elif menu == "Dashboard":
         textposition="inside",
         marker_color=colors["Guardians"]
     ))
-    
     fig.update_layout(
         barmode="stack",
         xaxis_title="Percentage",
@@ -372,8 +327,7 @@ elif menu == "Dashboard":
         yaxis=dict(categoryorder='array', categoryarray=sorted(pivot.index.astype(int))),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
-    
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, key="playercount_win_chart")
 
 # -----------------------------
 # GAME HISTORY
