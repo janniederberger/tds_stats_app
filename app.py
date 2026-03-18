@@ -90,13 +90,17 @@ elif menu == "Dashboard":
         st.stop()
         
     st.markdown("<br><br>", unsafe_allow_html=True)
+    
     # --- Stars Section ---
     all_star = df_stats.sort_values("winrate", ascending=False).iloc[0]
     almighty_adv = df_stats.sort_values("adv_rate", ascending=False).iloc[0]
     groofy_guard = df_stats.sort_values("guardian_rate", ascending=False).iloc[0]
 
-    # Kachel-Stil (Farbe, Transparenz, Radius, Schatten)
-    def card(content, bg_color="#ffffff", alpha=0.8):
+    # Einheitliche Kachel-Farbe und Transparenz
+    card_bg_color = "#f0f0f0"  # helle graue Kachel
+    alpha = 0.3  # Transparenz
+
+    def card(content, bg_color=card_bg_color, alpha=alpha):
         style = f"""
         <div style="
             background-color: rgba({int(bg_color[1:3],16)},{int(bg_color[3:5],16)},{int(bg_color[5:7],16)},{alpha});
@@ -115,27 +119,27 @@ elif menu == "Dashboard":
 
     with cols[0]:
         content = f"""
-        <h4>TDS All Star</h4>
+        ***TDS All Star***
         <h3>{all_star['player']}</h3>
         <h2 style='color:lightblue'>{all_star['winrate']*100:.1f}%</h2>
         """
-        st.markdown(card(content, bg_color="#e0f7ff", alpha=0.3), unsafe_allow_html=True)
+        st.markdown(card(content), unsafe_allow_html=True)
 
     with cols[1]:
         content = f"""
-        <h4>Almighty Adventurer</h4>
+        ***Almighty Adventurer***
         <h3>{almighty_adv['player']}</h3>
         <h2 style='color:olive'>{almighty_adv['adv_rate']*100:.1f}%</h2>
         """
-        st.markdown(card(content, bg_color="#f0ffe0", alpha=0.3), unsafe_allow_html=True)
+        st.markdown(card(content), unsafe_allow_html=True)
 
     with cols[2]:
         content = f"""
-        <h4>Groofy Guardian</h4>
+        ***Groofy Guardian***
         <h3>{groofy_guard['player']}</h3>
         <h2 style='color:purple'>{groofy_guard['guardian_rate']*100:.1f}%</h2>
         """
-        st.markdown(card(content, bg_color="#f5e0ff", alpha=0.3), unsafe_allow_html=True)
+        st.markdown(card(content), unsafe_allow_html=True)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     
