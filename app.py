@@ -90,32 +90,54 @@ elif menu == "Dashboard":
         st.stop()
         
     st.markdown("<br><br>", unsafe_allow_html=True)
-
     # --- Stars Section ---
     all_star = df_stats.sort_values("winrate", ascending=False).iloc[0]
     almighty_adv = df_stats.sort_values("adv_rate", ascending=False).iloc[0]
     groofy_guard = df_stats.sort_values("guardian_rate", ascending=False).iloc[0]
-    
-    cols = st.columns(3)
-    with cols[0]:
-        st.markdown("***TDS All Star***")
-        st.markdown(f"### {all_star['player']}")
-        st.markdown(f"<h2 style='color:lightblue'>{all_star['winrate']*100:.1f}%</h2>", unsafe_allow_html=True)
-    with cols[1]:
-        st.markdown("***Almighty Adventurer***")
-        st.markdown(f"### {almighty_adv['player']}")
-        st.markdown(f"<h2 style='color:olive'>{almighty_adv['adv_rate']*100:.1f}%</h2>", unsafe_allow_html=True)
-    with cols[2]:
-        st.markdown("***Groofy Guardian***")
-        st.markdown(f"### {groofy_guard['player']}")
-        st.markdown(f"<h2 style='color:purple'>{groofy_guard['guardian_rate']*100:.1f}%</h2>", unsafe_allow_html=True)
-            
-    st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # --- Sorted Stats for Charts ---
-    df_stats_sorted = df_stats.sort_values("winrate", ascending=True)
-    df_adv_sorted = df_stats.sort_values("adv_rate", ascending=True)
-    df_guard_sorted = df_stats.sort_values("guardian_rate", ascending=True)
+    # Kachel-Stil (Farbe, Transparenz, Radius, Schatten)
+    def card(content, bg_color="#ffffff", alpha=0.8):
+        style = f"""
+        <div style="
+            background-color: rgba({int(bg_color[1:3],16)},{int(bg_color[3:5],16)},{int(bg_color[5:7],16)},{alpha});
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+            text-align:center;
+            margin-bottom:10px;
+        ">
+            {content}
+        </div>
+        """
+        return style
+
+    cols = st.columns(3)
+
+    with cols[0]:
+        content = f"""
+        <h4>TDS All Star</h4>
+        <h3>{all_star['player']}</h3>
+        <h2 style='color:lightblue'>{all_star['winrate']*100:.1f}%</h2>
+        """
+        st.markdown(card(content, bg_color="#e0f7ff", alpha=0.3), unsafe_allow_html=True)
+
+    with cols[1]:
+        content = f"""
+        <h4>Almighty Adventurer</h4>
+        <h3>{almighty_adv['player']}</h3>
+        <h2 style='color:olive'>{almighty_adv['adv_rate']*100:.1f}%</h2>
+        """
+        st.markdown(card(content, bg_color="#f0ffe0", alpha=0.3), unsafe_allow_html=True)
+
+    with cols[2]:
+        content = f"""
+        <h4>Groofy Guardian</h4>
+        <h3>{groofy_guard['player']}</h3>
+        <h2 style='color:purple'>{groofy_guard['guardian_rate']*100:.1f}%</h2>
+        """
+        st.markdown(card(content, bg_color="#f5e0ff", alpha=0.3), unsafe_allow_html=True)
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
     
     # --- Total Winrate Chart ---
     st.subheader("Total Ranking")
