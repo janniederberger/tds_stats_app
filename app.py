@@ -316,7 +316,7 @@ elif menu == "Game History":
         st.info("No existing Games")
         st.stop()
 
-    # Track deleted games in session state
+    # Session-State für gelöschte Spiele
     if "deleted_games" not in st.session_state:
         st.session_state.deleted_games = set()
 
@@ -332,8 +332,8 @@ elif menu == "Game History":
             st.table(df_game)
 
             # Delete-Button
-            if st.button("Delete Game", key=f"delete{game_id}"):
+            button_key = f"delete{game_id}"
+            if st.button("Delete Game", key=button_key):
                 delete_game(game_id)
                 st.session_state.deleted_games.add(game_id)
                 st.warning(f"Game {game_id} deleted")
-                st.experimental_rerun()  # Jetzt sicher nutzbar, da wir Session-State verwenden
