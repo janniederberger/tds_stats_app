@@ -90,7 +90,7 @@ elif menu == "Dashboard":
         st.stop()
         
     st.markdown("<br><br>", unsafe_allow_html=True)
-    
+
     # --- Stars Section ---
     all_star = df_stats.sort_values("winrate", ascending=False).iloc[0]
     almighty_adv = df_stats.sort_values("adv_rate", ascending=False).iloc[0]
@@ -106,7 +106,7 @@ elif menu == "Dashboard":
             background-color: rgba({int(bg_color[1:3],16)},{int(bg_color[3:5],16)},{int(bg_color[5:7],16)},{alpha});
             border-radius: 15px;
             padding: 15px;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
             text-align:center;
             margin-bottom:10px;
         ">
