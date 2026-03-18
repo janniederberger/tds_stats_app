@@ -4,3 +4,4 @@ numpy>=1.19,<2
 plotly>=5.16
 pillow>=10
 rich>=14
+psycopg2-binary

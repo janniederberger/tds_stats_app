@@ -5,44 +5,55 @@ Created on Tue Mar 10 09:18:40 2026
 @author: niederberger jan
 """
 
-import sqlite3
+# database.py
 
-DB_NAME = "tds_stats.db"
+import psycopg2
+import streamlit as st
 
 
 def get_connection():
-    return sqlite3.connect(DB_NAME, check_same_thread=False)
+    return psycopg2.connect(
+        host=st.secrets["DB_HOST"],
+        database=st.secrets["DB_NAME"],
+        user=st.secrets["DB_USER"],
+        password=st.secrets["DB_PASSWORD"],
+        port=5432
+    )
 
 
 def init_db():
     conn = get_connection()
     cur = conn.cursor()
 
+    # --- PLAYERS ---
     cur.execute("""
     CREATE TABLE IF NOT EXISTS players (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         name TEXT UNIQUE
     )
     """)
 
+    # --- GAMES ---
     cur.execute("""
     CREATE TABLE IF NOT EXISTS games (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         date TEXT,
         player_count INTEGER,
         winning_team TEXT
     )
     """)
 
+    # --- PARTICIPATIONS ---
     cur.execute("""
     CREATE TABLE IF NOT EXISTS participations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        game_id INTEGER,
-        player_id INTEGER,
+        id SERIAL PRIMARY KEY,
+        game_id INTEGER REFERENCES games(id) ON DELETE CASCADE,
+        player_id INTEGER REFERENCES players(id) ON DELETE CASCADE,
         role TEXT,
         won INTEGER
     )
     """)
 
     conn.commit()
+    cur.close()
     conn.close()
