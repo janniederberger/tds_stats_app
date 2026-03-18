@@ -124,7 +124,7 @@ elif menu == "Dashboard":
             """
             <style>
             .total_winrate_container > div {
-                background-color: rgba(240,240,240,0.3);
+                background-color: rgba(200,200,200,0.3);
                 padding: 15px;
                 border-radius: 10px;
             }
