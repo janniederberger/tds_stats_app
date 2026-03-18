@@ -315,12 +315,25 @@ elif menu == "Game History":
     if not games:
         st.info("No existing Games")
         st.stop()
+
+    # Track deleted games in session state
+    if "deleted_games" not in st.session_state:
+        st.session_state.deleted_games = set()
+
     for g in games:
         game_id, date, player_count, winning_team = g
+
+        # Überspringe bereits gelöschte Spiele
+        if game_id in st.session_state.deleted_games:
+            continue
+
         with st.expander(f"Game {game_id} | {player_count} Players | Winning Team: {winning_team} | {pd.to_datetime(date)}"):
-            df_game = pd.DataFrame(get_game_details(game_id), columns=["Player","Role","Won"])
+            df_game = pd.DataFrame(get_game_details(game_id), columns=["Player", "Role", "Won"])
             st.table(df_game)
+
+            # Delete-Button
             if st.button("Delete Game", key=f"delete{game_id}"):
                 delete_game(game_id)
+                st.session_state.deleted_games.add(game_id)
                 st.warning(f"Game {game_id} deleted")
-                st.experimental_rerun()
+                st.experimental_rerun()  # Jetzt sicher nutzbar, da wir Session-State verwenden
