@@ -142,13 +142,13 @@ elif menu == "Dashboard":
         x=df_stats_sorted["winrate"]*100,
         orientation="h",
         marker_color="lightblue",
-        text=[f"{v*100:.1f}% ({n} Spiele)" for v, n in zip(df_stats_sorted["winrate"], df_stats_sorted["games"])],
+        text=[f"{v*100:.1f}% ({n} Games)" for v, n in zip(df_stats_sorted["winrate"], df_stats_sorted["games"])],
         textposition="inside"
     ))
     fig_total.update_layout(
         xaxis_title="Total Winrate (%)",
         xaxis=dict(range=[0, 100]),
-        yaxis_title="Spieler",
+        yaxis_title="Player",
         margin=dict(l=100, r=50, t=20, b=50),
         height=50 + 30*len(df_stats_sorted)
     )
@@ -160,13 +160,13 @@ elif menu == "Dashboard":
         x=df_adv_sorted["adv_rate"]*100,
         orientation="h",
         marker_color="olive",
-        text=[f"{v*100:.1f}% ({n} Spiele)" for v, n in zip(df_adv_sorted["adv_rate"], df_adv_sorted["adv_games"])],
+        text=[f"{v*100:.1f}% ({n} Games)" for v, n in zip(df_adv_sorted["adv_rate"], df_adv_sorted["adv_games"])],
         textposition="inside"
     ))
     fig_adv.update_layout(
         xaxis_title="Adventurer Winrate (%)",
         xaxis=dict(range=[0, 100]),
-        yaxis_title="Spieler",
+        yaxis_title="Player",
         margin=dict(l=100, r=50, t=20, b=50),
         height=50 + 30*len(df_adv_sorted)
     )
@@ -178,13 +178,13 @@ elif menu == "Dashboard":
         x=df_guard_sorted["guardian_rate"]*100,
         orientation="h",
         marker_color="purple",
-        text=[f"{v*100:.1f}% ({n} Spiele)" for v, n in zip(df_guard_sorted["guardian_rate"], df_guard_sorted["guard_games"])],
+        text=[f"{v*100:.1f}% ({n} Games)" for v, n in zip(df_guard_sorted["guardian_rate"], df_guard_sorted["guard_games"])],
         textposition="inside"
     ))
     fig_guard.update_layout(
         xaxis_title="Guardian Winrate (%)",
         xaxis=dict(range=[0, 100]),
-        yaxis_title="Spieler",
+        yaxis_title="Player",
         margin=dict(l=100, r=50, t=20, b=50),
         height=50 + 30*len(df_guard_sorted)
     )
