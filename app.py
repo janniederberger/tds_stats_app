@@ -119,34 +119,41 @@ elif menu == "Dashboard":
     
     # --- Total Winrate Chart ---
     with st.container():
+        # Hintergrundfarbe für alle Kinder setzen
         st.markdown(
             """
-            <div style="
-                background-color: rgba(240,240,240,0.3); 
-                padding: 15px; 
+            <style>
+            .total_winrate_container > div {
+                background-color: rgba(240,240,240,0.3);
+                padding: 15px;
                 border-radius: 10px;
-            ">
-                st.subheader("Total Ranking")
-                fig = go.Figure(go.Bar(
-                    y=df_stats_sorted["player"],
-                    x=df_stats_sorted["winrate"]*100,
-                    orientation="h",
-                    marker_color="lightblue",
-                    text=[f"{v*100:.1f}% ({n} Spiele)" for v, n in zip(df_stats_sorted["winrate"], df_stats_sorted["games"])],
-                    textposition="inside"
-                ))
-                fig.update_layout(
-                    xaxis_title="Total Winrate (%)",
-                    xaxis=dict(range=[0, 100]),
-                    yaxis_title="Spieler",
-                    margin=dict(l=100, r=50, t=20, b=50),
-                    height=50 + 30*len(df_stats_sorted)
-                )
-                st.plotly_chart(fig, use_container_width=True, key="total_ranking_chart")
-            </div>
+            }
+            </style>
             """,
             unsafe_allow_html=True
         )
+
+        # Wrapper-Klasse für Container
+        st.markdown('<div class="total_winrate_container"></div>', unsafe_allow_html=True)
+
+        # Inhalt normal einfügen
+        st.subheader("Total Ranking")
+        fig = go.Figure(go.Bar(
+            y=df_stats_sorted["player"],
+            x=df_stats_sorted["winrate"]*100,
+            orientation="h",
+            marker_color="lightblue",
+            text=[f"{v*100:.1f}% ({n} Spiele)" for v, n in zip(df_stats_sorted["winrate"], df_stats_sorted["games"])],
+            textposition="inside"
+        ))
+        fig.update_layout(
+            xaxis_title="Total Winrate (%)",
+            xaxis=dict(range=[0, 100]),
+            yaxis_title="Spieler",
+            margin=dict(l=100, r=50, t=20, b=50),
+            height=50 + 30*len(df_stats_sorted)
+        )
+        st.plotly_chart(fig, use_container_width=True, key="total_ranking_chart")
     
 
     # --- Adventurer Winrate Chart ---
